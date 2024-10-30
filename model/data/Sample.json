@@ -1,0 +1,531 @@
+[
+    {
+        "Tokens": [
+            "Chatbot",
+            "này",
+            "có",
+            "thể",
+            "làm",
+            "những",
+            "gì"
+        ],
+        "Intent": "gioi_thieu",
+        "ner_labels": [
+            "O",
+            "O",
+            "O",
+            "O",
+            "O",
+            "O",
+            "O"
+        ]
+    },
+    {
+        "Tokens": [
+            "giới",
+            "thiệu",
+            "bản",
+            "thân"
+        ],
+        "Intent": "gioi_thieu",
+        "ner_labels": [
+            "O",
+            "O",
+            "O",
+            "O"
+        ]
+    },
+    {
+        "Tokens": [
+            "Nói",
+            "qua",
+            "về",
+            "bản",
+            "thân",
+            "đi"
+        ],
+        "Intent": "gioi_thieu",
+        "ner_labels": [
+            "O",
+            "O",
+            "O",
+            "O",
+            "O",
+            "O"
+        ]
+    },
+    {
+        "Tokens": [
+            "Bạn",
+            "có",
+            "thể",
+            "giới",
+            "thiệu",
+            "về",
+            "bản",
+            "thân",
+            "được",
+            "không"
+        ],
+        "Intent": "gioi_thieu",
+        "ner_labels": [
+            "O",
+            "O",
+            "O",
+            "O",
+            "O",
+            "O",
+            "O",
+            "O",
+            "O",
+            "O"
+        ]
+    },
+    {
+        "Tokens": [
+            "Bạn",
+            "được",
+            "phát",
+            "triển",
+            "để",
+            "giải",
+            "quyết",
+            "những",
+            "vấn",
+            "đề",
+            "gì",
+            "?"
+        ],
+        "Intent": "gioi_thieu",
+        "ner_labels": [
+            "O",
+            "O",
+            "O",
+            "O",
+            "O",
+            "O",
+            "O",
+            "O",
+            "O",
+            "O",
+            "O",
+            "O"
+        ]
+    },
+    {
+        "Tokens": [
+            "Bạn",
+            "là",
+            "ai",
+            "và",
+            "bạn",
+            "có",
+            "thể",
+            "giúp",
+            "gì",
+            "cho",
+            "tôi"
+        ],
+        "Intent": "gioi_thieu",
+        "ner_labels": [
+            "O",
+            "O",
+            "O",
+            "O",
+            "O",
+            "O",
+            "O",
+            "O",
+            "O",
+            "O",
+            "O"
+        ]
+    },
+    {
+        "Tokens": [
+            "Bạn",
+            "có",
+            "kỹ",
+            "năng",
+            "đặc",
+            "biệt",
+            "nào"
+        ],
+        "Intent": "gioi_thieu",
+        "ner_labels": [
+            "O",
+            "O",
+            "O",
+            "O",
+            "O",
+            "O",
+            "O"
+        ]
+    },
+    {
+        "Tokens": [
+            "Bạn",
+            "có",
+            "thể",
+            "giới",
+            "thiệu",
+            "bản",
+            "thân",
+            "được",
+            "không",
+            "?"
+        ],
+        "Intent": "gioi_thieu",
+        "ner_labels": [
+            "O",
+            "O",
+            "O",
+            "O",
+            "O",
+            "O",
+            "O",
+            "O",
+            "O",
+            "O"
+        ]
+    },
+    {
+        "Tokens": [
+            "bạn",
+            "có",
+            "thể",
+            "làm",
+            "gì"
+        ],
+        "Intent": "gioi_thieu",
+        "ner_labels": [
+            "O",
+            "O",
+            "O",
+            "O",
+            "O"
+        ]
+    },
+    {
+        "Tokens": [
+            "bạn",
+            "là",
+            "ai"
+        ],
+        "Intent": "gioi_thieu",
+        "ner_labels": [
+            "O",
+            "O",
+            "O"
+        ]
+    },
+    {
+        "Tokens": [
+            "See",
+            "you"
+        ],
+        "Intent": "tam_biet",
+        "ner_labels": [
+            "O",
+            "O"
+        ]
+    },
+    {
+        "Tokens": [
+            "See",
+            "you",
+            "later"
+        ],
+        "Intent": "tam_biet",
+        "ner_labels": [
+            "O",
+            "O",
+            "O"
+        ]
+    },
+    {
+        "Tokens": [
+            "Hẹn",
+            "gặp",
+            "lại",
+            "sau"
+        ],
+        "Intent": "tam_biet",
+        "ner_labels": [
+            "O",
+            "O",
+            "O",
+            "O"
+        ]
+    },
+    {
+        "Tokens": [
+            "Ok",
+            "tôi",
+            "cần",
+            "thế",
+            "thôi",
+            ",",
+            "gặp",
+            "lại",
+            "sau",
+            "nhé"
+        ],
+        "Intent": "tam_biet",
+        "ner_labels": [
+            "O",
+            "O",
+            "O",
+            "O",
+            "O",
+            "O",
+            "O",
+            "O",
+            "O",
+            "O"
+        ]
+    },
+    {
+        "Tokens": [
+            "Tạm",
+            "biệt",
+            "bạn"
+        ],
+        "Intent": "tam_biet",
+        "ner_labels": [
+            "O",
+            "O",
+            "O"
+        ]
+    },
+    {
+        "Tokens": [
+            "Mình",
+            "chào",
+            "bạn"
+        ],
+        "Intent": "chao_hoi",
+        "ner_labels": [
+            "O",
+            "O",
+            "O"
+        ]
+    },
+    {
+        "Tokens": [
+            "Hey",
+            "!"
+        ],
+        "Intent": "chao_hoi",
+        "ner_labels": [
+            "O",
+            "O"
+        ]
+    },
+    {
+        "Tokens": [
+            "Hello",
+            "bạn",
+            "nhé"
+        ],
+        "Intent": "chao_hoi",
+        "ner_labels": [
+            "O",
+            "O",
+            "O"
+        ]
+    },
+    {
+        "Tokens": [
+            "Rất",
+            "vui",
+            "được",
+            "gặp",
+            "bạn"
+        ],
+        "Intent": "chao_hoi",
+        "ner_labels": [
+            "O",
+            "O",
+            "O",
+            "O",
+            "O"
+        ]
+    },
+    {
+        "Tokens": [
+            "Mến",
+            "chào"
+        ],
+        "Intent": "chao_hoi",
+        "ner_labels": [
+            "O",
+            "O"
+        ]
+    },
+    {
+        "Tokens": [
+            "Chào",
+            "buổi",
+            "tối"
+        ],
+        "Intent": "chao_hoi",
+        "ner_labels": [
+            "O",
+            "O",
+            "O"
+        ]
+    },
+    {
+        "Tokens": [
+            "Chào",
+            "buổi",
+            "chiều"
+        ],
+        "Intent": "chao_hoi",
+        "ner_labels": [
+            "O",
+            "O",
+            "O"
+        ]
+    },
+    {
+        "Tokens": [
+            "bai",
+            "bai"
+        ],
+        "Intent": "tam_biet",
+        "ner_labels": [
+            "O",
+            "O"
+        ]
+    },
+    {
+        "Tokens": [
+            "bái",
+            "bai"
+        ],
+        "Intent": "tam_biet",
+        "ner_labels": [
+            "O",
+            "O"
+        ]
+    },
+    {
+        "Tokens": [
+            "chào",
+            "buổi",
+            "sáng"
+        ],
+        "Intent": "chao_hoi",
+        "ner_labels": [
+            "O",
+            "O",
+            "O"
+        ]
+    },
+    {
+        "Tokens": [
+            "goodbye"
+        ],
+        "Intent": "tam_biet",
+        "ner_labels": [
+            "O"
+        ]
+    },
+    {
+        "Tokens": [
+            "chào",
+            "bạn"
+        ],
+        "Intent": "chao_hoi",
+        "ner_labels": [
+            "O",
+            "O"
+        ]
+    },
+    {
+        "Tokens": [
+            "hẹn",
+            "gặp",
+            "lại"
+        ],
+        "Intent": "tam_biet",
+        "ner_labels": [
+            "O",
+            "O",
+            "O"
+        ]
+    },
+    {
+        "Tokens": [
+            "hi"
+        ],
+        "Intent": "chao_hoi",
+        "ner_labels": [
+            "O"
+        ]
+    },
+    {
+        "Tokens": [
+            "tạm",
+            "biệt"
+        ],
+        "Intent": "tam_biet",
+        "ner_labels": [
+            "O",
+            "O"
+        ]
+    },
+    {
+        "Tokens": [
+            "tạm",
+            "biệt",
+            "nhé"
+        ],
+        "Intent": "tam_biet",
+        "ner_labels": [
+            "O",
+            "O",
+            "O"
+        ]
+    },
+    {
+        "Tokens": [
+            "xin",
+            "chào"
+        ],
+        "Intent": "chao_hoi",
+        "ner_labels": [
+            "O",
+            "O"
+        ]
+    },
+    {
+        "Tokens": [
+            "bye"
+        ],
+        "Intent": "tam_biet",
+        "ner_labels": [
+            "O"
+        ]
+    },
+    {
+        "Tokens": [
+            "chào"
+        ],
+        "Intent": "chao_hoi",
+        "ner_labels": [
+            "O"
+        ]
+    },
+    {
+        "Tokens": [
+            "hello"
+        ],
+        "Intent": "chao_hoi",
+        "ner_labels": [
+            "O"
+        ]
+    }
+]
