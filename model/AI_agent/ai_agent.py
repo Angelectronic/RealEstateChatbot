@@ -5,13 +5,32 @@ from huggingface_hub import InferenceClient
 from model.AI_agent.LLM import LLM
 from model.AI_agent.utils import convert_price_to_text
 from langchain_core.messages import HumanMessage, AIMessage
+import os
 
 class AIAgent:
     def __init__(self, model_checkpoint = "model/ViT5-real-estate-ner", limit_query = 3):
         self.__ner_pipeline = pipeline("ner", model=model_checkpoint, aggregation_strategy="simple", device=0)
         self.__collection = pymongo.MongoClient("mongodb://localhost:27017")["real_estate"]["batdongsan"]
         self.__limit_query = limit_query
-        self.__llm = LLM(client=InferenceClient(api_key="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"))
+        self.__llm = LLM(client=InferenceClient(api_key=os.environ["HF_TOKEN"]))
+        self.__intent_classify_prompt = [
+            { "role": "system", "content": "Bạn là một trợ lý ảo. Nếu người dùng hỏi những câu liên quan đến bất động sản, tìm nhà, hãy trả lời \"[CALL_TOOL]\". Còn lại thì trả lời như bình thường" },
+            { "role": "user", "content": "Xin chào" },
+            { "role": "assistant", "content": "Xin chào! Rất vui được gặp bạn. Tôi có thể giúp gì cho bạn hôm nay?" },
+            { "role": "user", "content": "Tìm nhà ở Hà Nội" },
+            { "role": "assistant", "content": "[CALL_TOOL]" },
+            { "role": "user", "content": "Bạn là ai" },
+            { "role": "assistant", "content": "Xin chào! Tôi là trợ lý ảo của bạn, được tạo ra để hỗ trợ bạn trong nhiều vấn đề khác nhau. Tôi có thể giúp bạn tìm thông tin, giải đáp thắc mắc, và nhiều hơn thế. Bạn cần tôi giúp gì hôm nay?" },
+            { "role": "user", "content": "Cho tôi thông tin về chung cư mini ở Hồ Chí Minh" },
+            { "role": "assistant", "content": "[CALL_TOOL]" }
+        ]
+        self. __rewrite_prompt = [
+            { "role": "system", "content": "Viết lại câu sau cho mạch lạc, dễ hiểu và đúng ngữ pháp hơn. Đảm bảo câu văn có giọng điệu trang trọng và chuyên nghiệp, đồng thời loại bỏ từ viết tắt hoặc từ không cần thiết nếu có" },
+            { "role": "user", "content": "nhà ở hà nội nào có hướng TaayBawc ban công, từ 1 tỷ đến 2 tỷ, diện tích từ 50 đến 100m2" },
+            { "role": "assistant", "content": "Tìm nhà ở Hà Nội có ban công hướng Tây - Bắc, giá từ 1 tỷ đến 2 tỷ, diện tích từ 50 m2 đến 100 m2" },
+            { "role": "user", "content": "nhà ở hà nội nào có hướng đông, ban công Nam Đông, giá từ 1 tỷ đến 2 tỷ, diện tích từ 50 đến 100m2" },
+            { "role": "assistant", "content": "Tìm nhà ở Hà Nội có ban công hướng Đông, ban công hướng Đông - Nam, giá từ 1 tỷ đến 2 tỷ, diện tích từ 50 m2 đến 100 m2" }
+        ]
 
     def chat_complete(self, chat_history):
         input_llm = []
@@ -21,27 +40,32 @@ class AIAgent:
             elif chat['role'] == "assistant":
                 input_llm.append(AIMessage(content=chat['content']))
         
-        llm_response = self.__llm.invoke(input_llm)
+        llm_response = self.__llm.invoke(input_llm, chat_history=self.__intent_classify_prompt)
 
         if llm_response.content == "[CALL_TOOL]":
             print("NER NODE")
             user_message = chat_history[-1]['content']
-            return self.__ner_node(user_message)
+            rewrite_response = self.__llm.invoke([HumanMessage(content=user_message)], chat_history=self.__rewrite_prompt)
+            print(rewrite_response.content)
+            return self._ner_node(rewrite_response.content)
         else:
             print("LLM NODE")
             print(llm_response.content)
             return [llm_response.content.replace("[CALL_TOOL]", "")]
+        
+    def _rewrite_message(self, message):
+        pass
     
-    def __ner_node(self, user_message):
+    def _ner_node(self, user_message):
         entites = self.__ner_pipeline(user_message)
-        format_entities = self.__format_entities(entites)
+        format_entities = self._format_entities(entites)
         print(format_entities)
-        result = self.__query(format_entities)
-        response = self.__create_response(result)
+        result = self._query(format_entities)
+        response = self._create_response(result)
 
         return response
     
-    def __format_entities(self, entities):
+    def _format_entities(self, entities):
         # format_entities = []
         # for e in entities:
         #     exist_keys = [list(entity.keys())[0] for entity in format_entities]
@@ -54,7 +78,7 @@ class AIAgent:
 
         return [{f"{entity['entity_group']}": entity['word']} for entity in entities]
     
-    def __create_response(self, query_result):
+    def _create_response(self, query_result):
         if len(query_result) == 0:
             return ["Xin lỗi, tôi không tìm thấy kết quả nào phù hợp với yêu cầu của bạn. Vui lòng thử lại với yêu cầu khác."]
         
@@ -82,7 +106,7 @@ class AIAgent:
             response.append(html_res)
         return response
     
-    def __query(self, entities):
+    def _query(self, entities):
         type_1 = ['house_direction', 'balcony_direction', 'district', 'type_of_land', 'city', 'legal']
         type_2 = ['min_price', 'max_price', 'max_acreage', 'min_acreage']
 
@@ -118,12 +142,9 @@ class AIAgent:
         result = self.__collection.find(query).limit(self.__limit_query)
         return list(result)
     
-    def test_query(self, entities):
-        return self.__query(entities)
-    
 
 if __name__ == "__main__":
     agent = AIAgent()
-    results = agent.test_query([{'district': 'Quận 1'}, {'min_price': 1000000000}])
+    results = agent._query([{'district': 'Quận 1'}, {'min_price': 1000000000}])
     print(results)
     print(len(results))

@@ -6,6 +6,7 @@ from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_core.messages import BaseMessage, HumanMessage, AIMessage
 from langchain_core.callbacks import CallbackManagerForLLMRun
 from huggingface_hub import InferenceClient
+import os
 
 class LLM(BaseChatModel):
 
@@ -33,17 +34,7 @@ class LLM(BaseChatModel):
                   downstream and understand why generation stopped.
             run_manager: A run manager with callbacks for the LLM.
         """
-        chat_history = [
-            { "role": "system", "content": "Bạn là một trợ lý ảo. Nếu người dùng hỏi những câu liên quan đến bất động sản, tìm nhà, hãy trả lời \"[CALL_TOOL]\". Còn lại thì trả lời như bình thường" },
-            { "role": "user", "content": "Xin chào" },
-            { "role": "assistant", "content": "Xin chào! Rất vui được gặp bạn. Tôi có thể giúp gì cho bạn hôm nay?" },
-            { "role": "user", "content": "Tìm nhà ở Hà Nội" },
-            { "role": "assistant", "content": "[CALL_TOOL]" },
-            { "role": "user", "content": "Bạn là ai" },
-            { "role": "assistant", "content": "Xin chào! Tôi là trợ lý ảo của bạn, được tạo ra để hỗ trợ bạn trong nhiều vấn đề khác nhau. Tôi có thể giúp bạn tìm thông tin, giải đáp thắc mắc, và nhiều hơn thế. Bạn cần tôi giúp gì hôm nay?" },
-            { "role": "user", "content": "Cho tôi thông tin về chung cư mini ở Hồ Chí Minh" },
-            { "role": "assistant", "content": "[CALL_TOOL]" }
-        ]
+        chat_history = kwargs.get("chat_history", [{"role": "system", "content": "You are a friendly assistant"}])
 
         for message in messages:
             if isinstance(message, HumanMessage):
@@ -85,8 +76,8 @@ class LLM(BaseChatModel):
         }
     
 if __name__ == "__main__":
-    client = InferenceClient(api_key="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")
+    client = InferenceClient(api_key=os.environ["HF_TOKEN"])
     custom_llm = LLM(client=client)
 
-    result = custom_llm.invoke([HumanMessage(content="Xin chào")])
+    result = custom_llm.invoke([HumanMessage(content="Xin chào")], chat_history=[{"role": "system", "content": "You are a friendly assistant2"}])
     print(result.content)
