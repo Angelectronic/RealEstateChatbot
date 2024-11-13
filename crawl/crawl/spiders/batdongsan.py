@@ -53,6 +53,9 @@ class BatdongsanSpider(scrapy.Spider):
             yield scrapy.Request(url=next_page, callback=self.parse, headers=self.headers)
 
     def parse_summary(self, response):
+        if response.status == 403:
+            print("Forbidden")
+            return
         loader = ItemLoader(item=RealEstateItem(), selector=response)
         broker_loader = ItemLoader(item=BrokersItem(), selector=response)
 
