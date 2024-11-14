@@ -26,10 +26,10 @@ class AIAgent:
         ]
         self. __rewrite_prompt = [
             { "role": "system", "content": "Viết lại câu sau cho mạch lạc, dễ hiểu và đúng ngữ pháp hơn. Đảm bảo câu văn có giọng điệu trang trọng và chuyên nghiệp, đồng thời loại bỏ từ viết tắt hoặc từ không cần thiết nếu có" },
-            { "role": "user", "content": "nhà ở hà nội nào có hướng TaayBawc ban công, từ 1 tỷ đến 2 tỷ, diện tích từ 50 đến 100m2" },
+            { "role": "user", "content": "Cho tôi nhà ở hà nội có hướng TaayBawc ban công, từ 1 tỷ đến 2 tỷ, diện tích từ 50 đến 100m2" },
             { "role": "assistant", "content": "Tìm nhà ở Hà Nội có ban công hướng Tây - Bắc, giá từ 1 tỷ đến 2 tỷ, diện tích từ 50 m2 đến 100 m2" },
-            { "role": "user", "content": "nhà ở hà nội nào có hướng đông, ban công Nam Đông, giá từ 1 tỷ đến 2 tỷ, diện tích từ 50 đến 100m2" },
-            { "role": "assistant", "content": "Tìm nhà ở Hà Nội có ban công hướng Đông, ban công hướng Đông - Nam, giá từ 1 tỷ đến 2 tỷ, diện tích từ 50 m2 đến 100 m2" }
+            { "role": "user", "content": "nhà ở nam định nào có hướng đông, ban công Nam Đông, trong khoảng từ một đến hai tỷ, diện tích từ 75 đến một trăm mét vuông" },
+            { "role": "assistant", "content": "Tìm nhà ở Nam Định có ban công hướng Đông, ban công hướng Đông - Nam, giá từ 1 tỷ đến 2 tỷ, diện tích từ 75 m2 đến 100 m2" }
         ]
 
     def chat_complete(self, chat_history):
