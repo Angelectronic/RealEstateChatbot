@@ -1,22 +1,20 @@
 from transformers import pipeline
-import pymongo
 import gradio as gr
 from huggingface_hub import InferenceClient
 from model.AI_agent.LLM import LLM
 from model.AI_agent.utils import convert_price_to_text
-from langchain_core.messages import HumanMessage, AIMessage
 import os
 from model.AI_agent.NER_agent import NERAgent
 from model.AI_agent.Chat_agent import ChatAgent
 from model.AI_agent.Router import Router
-from langgraph.graph import StateGraph
+from langgraph.graph import StateGraph, START, END
 from typing_extensions import TypedDict
-from typing import List
+from typing import List, Union
+
 
 class State(TypedDict):
     chat_history: List[dict]
-    user_message: str
-
+    response_list: List[Union[str, gr.HTML]]
 
 class AIAgent:
     def __init__(self):
@@ -25,26 +23,37 @@ class AIAgent:
         self._chat_agent = ChatAgent(llm=self.__llm)
         self._router = Router(llm=self.__llm)
 
-    def chat_complete(self, chat_history):
-        router_path = self._router.run(chat_history)
-        if router_path == "[SEARCH_HOUSE]":
-            print("NER NODE")
-            return self._ner_node(chat_history)
-        elif router_path == "[NORMAL_CHAT]":
-            print("CHAT NODE")
-            return self._chat_node(chat_history)
+        self._graph_builder = StateGraph(State)
+        self._graph_builder.add_node("chat", self._chat_node)
+        self._graph_builder.add_node("ner", self._ner_node)
+        self._graph_builder.add_conditional_edges(START, self._router_node, {"chat": "chat", "ner": "ner"})
+        self._graph_builder.add_edge("chat", END)
+        self._graph_builder.add_edge("ner", END)
+        self.app = self._graph_builder.compile()
         
-    def _chat_node(self, chat_history):
-        response_text = self._chat_agent.run(chat_history)
-        print(response_text)
-        return [response_text]
+
+    def _router_node(self, state):
+        router_path = self._router.run(state['chat_history'])
+        print(router_path)
+        if router_path == "[SEARCH_HOUSE]":
+            return "ner"
+        elif router_path == "[NORMAL_CHAT]":
+            return "chat"
     
-    def _ner_node(self, chat_history):
-        user_message = chat_history[-1]['content']
+    def _chat_node(self, state):
+        response_text = self._chat_agent.run(state['chat_history'])
+        print(response_text)
+        return {"response_list": [response_text]}
+    
+    def _ner_node(self, state):
+        user_message = state['chat_history'][-1]['content']
         result = self._ner_agent.run(user_message)
         response = self._create_response(result)
+        return {"response_list": response}
 
-        return response
+    def chat_complete(self, chat_history):
+        state = self.app.invoke({"chat_history": chat_history})
+        return state['response_list']
     
     def _create_response(self, query_result):
         if len(query_result) == 0:
@@ -73,9 +82,3 @@ class AIAgent:
                                 """)
             response.append(html_res)
         return response
-
-if __name__ == "__main__":
-    agent = AIAgent()
-    results = agent._query([{'district': 'Quận 1'}, {'min_price': 1000000000}])
-    print(results)
-    print(len(results))
