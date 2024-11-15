@@ -6,77 +6,45 @@ from model.AI_agent.LLM import LLM
 from model.AI_agent.utils import convert_price_to_text
 from langchain_core.messages import HumanMessage, AIMessage
 import os
+from model.AI_agent.NER_agent import NERAgent
+from model.AI_agent.Chat_agent import ChatAgent
+from model.AI_agent.Router import Router
+from langgraph.graph import StateGraph
+from typing_extensions import TypedDict
+from typing import List
+
+class State(TypedDict):
+    chat_history: List[dict]
+    user_message: str
+
 
 class AIAgent:
-    def __init__(self, model_checkpoint = "model/ViT5-real-estate-ner", limit_query = 3):
-        self.__ner_pipeline = pipeline("ner", model=model_checkpoint, aggregation_strategy="simple", device=0)
-        self.__collection = pymongo.MongoClient("mongodb://localhost:27017")["real_estate"]["batdongsan"]
-        self.__limit_query = limit_query
+    def __init__(self):
         self.__llm = LLM(client=InferenceClient(api_key=os.environ["HF_TOKEN"]))
-        self.__intent_classify_prompt = [
-            { "role": "system", "content": "Bạn là một trợ lý ảo. Nếu người dùng hỏi những câu liên quan đến bất động sản, tìm nhà, hãy trả lời \"[CALL_TOOL]\". Còn lại thì trả lời như bình thường" },
-            { "role": "user", "content": "Xin chào" },
-            { "role": "assistant", "content": "Xin chào! Rất vui được gặp bạn. Tôi có thể giúp gì cho bạn hôm nay?" },
-            { "role": "user", "content": "Tìm nhà ở Hà Nội" },
-            { "role": "assistant", "content": "[CALL_TOOL]" },
-            { "role": "user", "content": "Bạn là ai" },
-            { "role": "assistant", "content": "Xin chào! Tôi là trợ lý ảo của bạn, được tạo ra để hỗ trợ bạn trong nhiều vấn đề khác nhau. Tôi có thể giúp bạn tìm thông tin, giải đáp thắc mắc, và nhiều hơn thế. Bạn cần tôi giúp gì hôm nay?" },
-            { "role": "user", "content": "Cho tôi thông tin về chung cư mini ở Hồ Chí Minh" },
-            { "role": "assistant", "content": "[CALL_TOOL]" }
-        ]
-        self. __rewrite_prompt = [
-            { "role": "system", "content": "Viết lại câu sau cho mạch lạc, dễ hiểu và đúng ngữ pháp hơn. Đảm bảo câu văn có giọng điệu trang trọng và chuyên nghiệp, đồng thời loại bỏ từ viết tắt hoặc từ không cần thiết nếu có" },
-            { "role": "user", "content": "Cho tôi nhà ở hà nội có hướng TaayBawc ban công, từ 1 tỷ đến 2 tỷ, diện tích từ 50 đến 100m2" },
-            { "role": "assistant", "content": "Tìm nhà ở Hà Nội có ban công hướng Tây - Bắc, giá từ 1 tỷ đến 2 tỷ, diện tích từ 50 m2 đến 100 m2" },
-            { "role": "user", "content": "nhà ở nam định nào có hướng đông, ban công Nam Đông, trong khoảng từ một đến hai tỷ, diện tích từ 75 đến một trăm mét vuông" },
-            { "role": "assistant", "content": "Tìm nhà ở Nam Định có ban công hướng Đông, ban công hướng Đông - Nam, giá từ 1 tỷ đến 2 tỷ, diện tích từ 75 m2 đến 100 m2" }
-        ]
+        self._ner_agent = NERAgent(llm=self.__llm)
+        self._chat_agent = ChatAgent(llm=self.__llm)
+        self._router = Router(llm=self.__llm)
 
     def chat_complete(self, chat_history):
-        input_llm = []
-        for chat in chat_history:
-            if chat['role'] == "user":
-                input_llm.append(HumanMessage(content=chat['content']))
-            elif chat['role'] == "assistant":
-                input_llm.append(AIMessage(content=chat['content']))
-        
-        llm_response = self.__llm.invoke(input_llm, chat_history=self.__intent_classify_prompt)
-
-        if llm_response.content == "[CALL_TOOL]":
+        router_path = self._router.run(chat_history)
+        if router_path == "[SEARCH_HOUSE]":
             print("NER NODE")
-            user_message = chat_history[-1]['content']
-            rewrite_response = self.__llm.invoke([HumanMessage(content=user_message)], chat_history=self.__rewrite_prompt)
-            print(rewrite_response.content)
-            return self._ner_node(rewrite_response.content)
-        else:
-            print("LLM NODE")
-            print(llm_response.content)
-            return [llm_response.content.replace("[CALL_TOOL]", "")]
+            return self._ner_node(chat_history)
+        elif router_path == "[NORMAL_CHAT]":
+            print("CHAT NODE")
+            return self._chat_node(chat_history)
         
-    def _rewrite_message(self, message):
-        pass
+    def _chat_node(self, chat_history):
+        response_text = self._chat_agent.run(chat_history)
+        print(response_text)
+        return [response_text]
     
-    def _ner_node(self, user_message):
-        entites = self.__ner_pipeline(user_message)
-        format_entities = self._format_entities(entites)
-        print(format_entities)
-        result = self._query(format_entities)
+    def _ner_node(self, chat_history):
+        user_message = chat_history[-1]['content']
+        result = self._ner_agent.run(user_message)
         response = self._create_response(result)
 
         return response
-    
-    def _format_entities(self, entities):
-        # format_entities = []
-        # for e in entities:
-        #     exist_keys = [list(entity.keys())[0] for entity in format_entities]
-        #     if e['entity_group'] not in exist_keys:
-        #         format_entities.append({f"{e['entity_group']}": e['word'].strip()})
-        #     else:
-        #         for entity in format_entities:
-        #             if list(entity.keys())[0] == e['entity_group']:
-        #                 entity[e['entity_group']] += f"{e['word'].strip()}"
-
-        return [{f"{entity['entity_group']}": entity['word']} for entity in entities]
     
     def _create_response(self, query_result):
         if len(query_result) == 0:
@@ -105,43 +73,6 @@ class AIAgent:
                                 """)
             response.append(html_res)
         return response
-    
-    def _query(self, entities):
-        type_1 = ['house_direction', 'balcony_direction', 'district', 'type_of_land', 'city', 'legal']
-        type_2 = ['min_price', 'max_price', 'max_acreage', 'min_acreage']
-
-        query = {}
-        for entity in entities:
-            for key, value in entity.items():
-                if key in type_1:
-                    query[key] = {"$regex": value, "$options": "i"}
-                elif key in type_2:
-                    group_name = key.split("_")[1]
-                    min_max = key.split("_")[0]
-
-                    if group_name == "price":
-                        value = value.replace(",", ".").strip()
-                        unit = value.find("tỷ")
-                        if unit != -1:
-                            number = value.replace("tỷ", "").strip()
-                            value = float(number) * 1000000000
-                        else:
-                            unit = value.find("triệu")
-                            number = value.replace("triệu", "").strip()
-                            value = float(number) * 1000000
-
-                    elif group_name == "acreage":
-                        number = value.replace("m2", "").strip()
-                        value = float(number)
-
-                    if min_max == "min":
-                        query[group_name] = {"$gte": value}
-                    else:
-                        query[group_name] = {"$lte": value}
-        print(query)
-        result = self.__collection.find(query).limit(self.__limit_query)
-        return list(result)
-    
 
 if __name__ == "__main__":
     agent = AIAgent()
