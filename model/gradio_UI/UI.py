@@ -1,7 +1,7 @@
 import gradio as gr
 import sys
 sys.path.append('..')
-from model.gradio_UI.chat_layout import ChatLayout
+from model.gradio_UI.bot import Bot
 
 css="""
 a {
@@ -45,12 +45,20 @@ body {
 
 class Demo:
     def __init__(self):
-        self.chat_layout = ChatLayout()
+        self.bot = Bot()
+        
+    def clear(self):
+        return None
 
     def launch(self):
         with gr.Blocks(css=css) as interface:
-            self.chat_layout.show_layout()
+            chatbot = gr.Chatbot(height=500, elem_classes="equal-height", type='messages')
+            msg = gr.Textbox(label="User", submit_btn=True, placeholder="Nhập tin nhắn của bạn vào đây")
+            clear = gr.Button('Clear')
 
+            msg.submit(self.bot.chat, [msg],[chatbot, msg])
+        
+            clear.click(self.clear, None, [chatbot])
         interface.launch(share=False)
 
 
