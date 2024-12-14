@@ -35,9 +35,11 @@ class AIAgent:
     def _router_node(self, state):
         router_path = self._router.run(state['chat_history'])
         print(router_path)
-        if router_path == "[SEARCH_HOUSE]":
+        if "[NORMAL_CHAT]" in router_path:
+            return "chat"
+        elif "[SEARCH_HOUSE]" in router_path:
             return "ner"
-        elif router_path == "[NORMAL_CHAT]":
+        else:
             return "chat"
     
     def _chat_node(self, state):
