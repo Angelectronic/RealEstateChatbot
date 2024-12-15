@@ -35,6 +35,7 @@ class LLM(BaseChatModel):
             run_manager: A run manager with callbacks for the LLM.
         """
         chat_history = kwargs.get("chat_history", [{"role": "system", "content": "You are a friendly assistant"}])
+        max_tokens = kwargs.get("max_tokens", 1024)
 
         for message in messages:
             if isinstance(message, HumanMessage):
@@ -46,7 +47,7 @@ class LLM(BaseChatModel):
             model="Qwen/Qwen2.5-72B-Instruct", 
             messages=chat_history, 
             temperature=0.1,
-            max_tokens=1024,
+            max_tokens=max_tokens,
             top_p=0.7,
             stream=False
         )

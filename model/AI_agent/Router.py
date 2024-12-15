@@ -27,6 +27,6 @@ class Router:
     def run(self, chat_history):
         user_message = chat_history[-1]['content']
         input_llm = [HumanMessage(content=user_message)]
-        llm_response = self.__llm.invoke(input_llm, chat_history=self.__intent_classify_prompt)
+        llm_response = self.__llm.invoke(input_llm, chat_history=self.__intent_classify_prompt, max_tokens=128)
 
         return llm_response.content
