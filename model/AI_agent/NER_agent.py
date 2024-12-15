@@ -2,6 +2,7 @@ from transformers import pipeline
 import pymongo
 from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_core.messages import HumanMessage
+import copy
 
 class NERAgent:
     def __init__(self, llm: BaseChatModel, limit_query = 3, model_checkpoint = "model/ViT5-real-estate-ner"):
@@ -69,7 +70,7 @@ class NERAgent:
         return list(result)
 
     def run(self, user_message):
-        message = self.__llm.invoke([HumanMessage(content=user_message)], chat_history=self.__rewrite_prompt).content
+        message = self.__llm.invoke([HumanMessage(content=user_message)], chat_history=copy.deepcopy(self.__rewrite_prompt)).content
         print(message)
 
         entites = self.__ner_pipeline(message)
