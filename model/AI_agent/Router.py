@@ -1,5 +1,5 @@
 from transformers import pipeline
-import pymongo
+import copy
 from langchain_core.language_models.chat_models import BaseChatModel
 import os
 from langchain_core.messages import HumanMessage, AIMessage
@@ -27,6 +27,6 @@ class Router:
     def run(self, chat_history):
         user_message = chat_history[-1]['content']
         input_llm = [HumanMessage(content=user_message)]
-        llm_response = self.__llm.invoke(input_llm, chat_history=self.__intent_classify_prompt, max_tokens=128)
+        llm_response = self.__llm.invoke(input_llm, chat_history=copy.deepcopy(self.__intent_classify_prompt), max_tokens=128)
 
         return llm_response.content
